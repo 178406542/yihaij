@@ -1,0 +1,228 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+typedef struct ShoppingItem 
+{
+	char name[50];
+	int num;
+	struct ShoppingItem* next;
+}SS;
+SS* shoppingList = NULL;
+//1、添加商品到购物清单：
+void addItem(char itemName[], int itemNum)
+{
+	SS* newItem,*tail;
+	newItem = (SS*)malloc(sizeof(SS));
+	strcpy(newItem->name, itemName);
+	newItem->num = itemNum;
+	newItem->next = NULL;
+	if (shoppingList == NULL)
+	{
+		shoppingList = newItem;
+	}
+	else
+	{
+		tail = shoppingList;
+		while (tail->next != NULL)
+		{
+			tail = tail->next;
+		}
+		tail->next = newItem;
+	}
+}
+//2、从购物清单中移除商品：
+void removeItem(char itemName[])
+{
+	SS* cur = shoppingList;
+	SS* pre = NULL;
+	while (cur != NULL)
+	{
+		if (strcmp(cur->name, itemName) == 0)
+		{
+			if (pre != NULL)
+			{
+				pre->next = cur->next;
+			}
+			else
+			{
+				shoppingList = cur->next;
+			}
+			free(cur);
+			break;
+		}
+		pre = cur;
+		cur = cur->next;
+	}
+}
+//3、查看购物清单：
+void displayList()
+{
+	SS* cur = shoppingList;
+	printf("购物清单:\n");
+	while (cur != NULL)
+	{
+		printf("%s-数量：%d\n", cur->name, cur->num);
+		cur = cur->next;
+	}
+}
+//4、修改购物清单中商品的数量：
+void updataNum(char itemName[], int newItemNum)
+{
+	SS* cur = shoppingList;
+	while (cur != NULL)
+	{
+		if (strcmp(cur->name, itemName) == 0)
+		{
+			cur->num = newItemNum;
+			break;
+		}
+		cur = cur->next;
+	}
+}
+//5、清空购物清单：
+void clearList()
+{
+	SS* temp;
+	while (shoppingList != NULL)
+	{
+		temp = shoppingList;
+		shoppingList = temp->next;
+		free(temp);
+	}
+}
+//6、计算购物清单中商品的总数量：
+int totalNum()
+{
+	SS* cur = shoppingList;
+	int total = 0;
+	while (cur != NULL)
+	{
+		cur = cur->next;
+		total++;
+	}
+	return total;
+}
+//7、查找购物清单中的商品：
+void findItem(char itemName[])
+{
+	SS* cur = shoppingList;
+	printf("查找商品\"%s\" ：\n", itemName);
+	while (cur != NULL)
+	{
+		if (strcmp(cur->name, itemName) == 0)
+		{
+			printf("%s-数量：%d\n", cur->name, cur->num);
+			break;
+		}
+		cur = cur->next;
+	}
+	printf("未找到商品\"%s\"\n", itemName);
+}
+//8、排序购物清单：
+void sortList()
+{
+	SS* cur = shoppingList;
+	SS* nextItem = NULL;
+	char tempName[50];
+	int tempNum;
+	while (cur != NULL)
+	{
+		nextItem = cur->next;
+		while (nextItem != NULL)
+		{
+			if (strcmp(cur->name, nextItem->name) > 0)
+			{
+				strcpy(tempName, cur->name);
+				strcpy(cur->name, nextItem->name);
+				strcpy(nextItem->name, tempName);
+				tempNum = cur->num;
+				cur->num = nextItem->num;
+				nextItem->num = tempNum;
+			}
+			nextItem = nextItem->next;
+		}
+		cur = cur->next;
+	}
+}
+//9、合并购物清单：
+void mergeLists(SS** list1, SS** list2)
+{
+	SS* cur = *list1;
+	while (cur != NULL)
+	{
+		cur = cur->next;
+	}
+	cur->next = *list2;
+	*list2 = NULL;
+}
+//10、删除购物清单中的商品：
+void deleteItem(char itemName[], int deleteAll)
+{
+	SS* cur = shoppingList;
+	SS* pre = NULL;
+	while (cur != NULL)
+	{
+		if (strcmp(cur->name, itemName) == 0)
+		{
+			if (pre == NULL)
+			{
+				SS* temp = shoppingList;
+				shoppingList = temp->next;
+				free(temp);
+				if (!deleteAll)
+				{
+					break;
+				}
+			}
+			else
+			{
+				pre->next = cur->next;
+				free(cur);
+				cur = pre->next;
+				if (!deleteAll)
+				{
+					break;
+				}
+			}
+		}
+		else
+		{
+			pre = cur;
+			cur = cur->next;
+			
+		}
+	}
+	while (pre != NULL)
+	{
+		printf("%s %d\n", pre->name, pre->num);
+		pre = pre->next;
+	}
+}
+int main()
+{
+	char c[20];
+	int n,total=0;
+	while (1)
+	{
+		scanf("%s %d", c, &n);
+		if (n <= 0)
+		{
+			break;
+		}
+		addItem(c, n);
+	}
+	scanf("%s", c);
+	removeItem(c);
+	displayList();
+	scanf("%s %d", c, &n);
+	updataNum(c, n);
+	clearList();
+	total=totalNum();
+	printf("%d", total);
+	scanf("%s", c);
+	findItem(c);
+	sortList();
+	scanf("%s %d", c, n);
+	deleteItem(c, n);
+	return 0;
+}
